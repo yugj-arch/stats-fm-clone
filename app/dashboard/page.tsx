@@ -41,26 +41,40 @@ export default function DashboardPage() {
   const fetchData = async () => {
     setIsFetching(true)
     setError(null)
+    const token = session?.provider_token || localStorage.getItem('spotify_token')
+
+    // Fetch profile (never throws)
     try {
-      const token = session?.provider_token || localStorage.getItem('spotify_token')
-      
-      const [artistsData, tracksData, recentData, meData] = await Promise.all([
-        getTopArtists(token, timeRange),
-        getTopTracks(token, timeRange),
-        getRecentlyPlayed(token),
-        getMe(token)
-      ])
-      
-      setArtists(artistsData)
-      setTracks(tracksData)
-      setRecentTracks(recentData)
+      const meData = await getMe(token)
       setProfile(meData)
+    } catch {}
+
+    // Fetch artists
+    try {
+      const artistsData = await getTopArtists(token, timeRange)
+      setArtists(artistsData)
     } catch (err: any) {
-      console.error("Error fetching Spotify data:", err)
-      setError(err.message || "Failed to fetch real data")
-    } finally {
-      setIsFetching(false)
+      console.error('Artists fetch failed:', err.message)
+      if (err.message?.includes('403')) {
+        setError('Spotify returned 403 Forbidden. Your account may not be whitelisted yet in the Developer Dashboard, or the token has expired. Please sign out and log in again.')
+      } else {
+        setError(err.message)
+      }
     }
+
+    // Fetch tracks
+    try {
+      const tracksData = await getTopTracks(token, timeRange)
+      setTracks(tracksData)
+    } catch {}
+
+    // Fetch recently played
+    try {
+      const recentData = await getRecentlyPlayed(token)
+      setRecentTracks(recentData)
+    } catch {}
+
+    setIsFetching(false)
   }
 
   if (isLoading || !user) {
@@ -116,13 +130,19 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-6 py-8">
-        {error && !isDemo && (
-          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
-            <p className="font-bold mb-1">Error fetching real data:</p>
-            <p>{error}</p>
+        {error && (
+          <div className="mb-8 p-5 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl text-yellow-300 text-sm">
+            <p className="font-bold mb-2 text-base">⚠️ Spotify Access Blocked (403)</p>
+            <p className="text-yellow-400/80 mb-3">Your Spotify app is in <strong>Development Mode</strong>. To get real data, make sure:</p>
+            <ol className="list-decimal list-inside space-y-1 text-yellow-400/80 mb-3">
+              <li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" className="underline text-yellow-300">Spotify Developer Dashboard</a> → Your App → Settings → User Management</li>
+              <li>Add your exact Spotify email address and click <strong>"Add User"</strong></li>
+              <li>Click <strong>"Save"</strong> at the bottom</li>
+              <li>Come back, click <strong>Sign Out</strong>, then log in again</li>
+            </ol>
             <Button 
               variant="link" 
-              className="text-[#1DB954] p-0 h-auto mt-2" 
+              className="text-[#1DB954] p-0 h-auto" 
               onClick={() => fetchData()}
             >
               Try Again
