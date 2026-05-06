@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { toast } from "sonner"
 
 export default function HomePage() {
-  const { user, isLoading, skipLogin } = useAuth()
+  const { user, isLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -33,10 +33,6 @@ export default function HomePage() {
     }
   }
 
-  const handleDemoMode = () => {
-    skipLogin();
-    router.push("/dashboard");
-  }
 
   const features = [
     {
@@ -100,15 +96,7 @@ export default function HomePage() {
               </svg>
               Login with Spotify
             </Button>
-            
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="px-8 py-7 text-lg bg-transparent border-2 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-white font-bold rounded-full transition-all hover:scale-105"
-              onClick={handleDemoMode}
-            >
-              View Demo (No Login)
-            </Button>
+
           </div>
         </div>
       </section>

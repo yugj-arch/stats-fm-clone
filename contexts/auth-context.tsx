@@ -9,7 +9,6 @@ type AuthContextType = {
   session: Session | null
   isLoading: boolean
   signOut: () => Promise<void>
-  skipLogin: () => void
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,7 +16,6 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
   signOut: async () => {},
-  skipLogin: () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -128,13 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null)
   }, [])
 
-  const skipLogin = useCallback(() => {
-    setUser({ id: 'mock-user' } as User)
-    setSession({ provider_token: 'mock_token' } as Session)
-  }, [])
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, signOut, skipLogin }}>
+    <AuthContext.Provider value={{ user, session, isLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   )
