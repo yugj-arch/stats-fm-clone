@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-import { getTopArtists, getTopTracks, getRecentlyPlayed, SpotifyArtist, SpotifyTrack } from "@/lib/spotify"
+import { getTopArtists, getTopTracks, getRecentlyPlayed, getMe, SpotifyArtist, SpotifyTrack } from "@/lib/spotify"
 import { Button } from "@/components/ui/button"
 import { LogOut, Music, User, Activity, Sparkles } from "lucide-react"
 import { TopArtists } from "@/components/dashboard/top-artists"
@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [artists, setArtists] = useState<SpotifyArtist[]>([])
   const [tracks, setTracks] = useState<SpotifyTrack[]>([])
   const [recentTracks, setRecentTracks] = useState<any[]>([])
+  const [profile, setProfile] = useState<any>(null)
   const [isFetching, setIsFetching] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,15 +44,17 @@ export default function DashboardPage() {
     try {
       const token = session?.provider_token || localStorage.getItem('spotify_token')
       
-      const [artistsData, tracksData, recentData] = await Promise.all([
+      const [artistsData, tracksData, recentData, meData] = await Promise.all([
         getTopArtists(token, timeRange),
         getTopTracks(token, timeRange),
-        getRecentlyPlayed(token)
+        getRecentlyPlayed(token),
+        getMe(token)
       ])
       
       setArtists(artistsData)
       setTracks(tracksData)
       setRecentTracks(recentData)
+      setProfile(meData)
     } catch (err: any) {
       console.error("Error fetching Spotify data:", err)
       setError(err.message || "Failed to fetch real data")
@@ -89,6 +92,21 @@ export default function DashboardPage() {
             <span className="text-[#1DB954]">stats</span>.fm clone
           </div>
           <div className="flex items-center gap-4">
+            {profile && (
+              <div className="hidden sm:flex items-center gap-3 mr-4 border-r border-zinc-800 pr-4">
+                <div className="text-right">
+                  <p className="text-xs font-bold text-white leading-tight">{profile.display_name || 'Spotify User'}</p>
+                  <p className="text-[10px] text-zinc-500 leading-tight">{profile.email}</p>
+                </div>
+                {profile.images?.[0]?.url ? (
+                  <img src={profile.images[0].url} className="w-8 h-8 rounded-full border border-zinc-700" alt="Avatar" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold">
+                    {(profile.display_name || 'U').charAt(0)}
+                  </div>
+                )}
+              </div>
+            )}
             <Button variant="ghost" className="text-zinc-400 hover:text-white" onClick={() => signOut()}>
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out

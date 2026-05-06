@@ -128,3 +128,13 @@ export async function getAudioFeatures(accessToken: string | null, trackIds: str
     throw err;
   }
 }
+
+export async function getMe(accessToken: string | null): Promise<any> {
+  if (!accessToken) return { display_name: 'Guest' };
+  try {
+    return await fetchWebApi('me', 'GET', accessToken);
+  } catch (err) {
+    console.error('getMe failed:', err);
+    throw err;
+  }
+}
