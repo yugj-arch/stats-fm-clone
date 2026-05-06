@@ -1,5 +1,6 @@
 import { SpotifyTrack } from "@/lib/spotify"
 import Image from "next/image"
+import { motion } from "framer-motion"
 
 export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
   if (tracks.length === 0) {
@@ -12,10 +13,31 @@ export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
     return `${minutes}:${Number(seconds) < 10 ? '0' : ''}${seconds}`
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  }
+
   return (
-    <div className="space-y-4">
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-4"
+    >
       {tracks.map((track, index) => (
-        <div 
+        <motion.div 
+          variants={item}
           key={track.id} 
           className="flex items-center gap-4 p-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
         >
@@ -47,8 +69,8 @@ export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
           <div className="text-sm text-zinc-500 pr-4">
             {formatDuration(track.duration_ms)}
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 }

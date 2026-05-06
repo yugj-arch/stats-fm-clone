@@ -1,15 +1,36 @@
 import { SpotifyArtist } from "@/lib/spotify"
 import Image from "next/image"
+import { motion } from "framer-motion"
 
 export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
   if (artists.length === 0) {
     return <div className="text-zinc-400 text-center py-12">No artists found for this time period.</div>
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  }
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+    >
       {artists.map((artist, index) => (
-        <div key={artist.id} className="group relative">
+        <motion.div variants={item} key={artist.id} className="group relative">
           <div className="relative aspect-square overflow-hidden rounded-full border-4 border-transparent hover:border-[#1DB954] transition-all duration-300 shadow-lg mb-4">
             {artist.images[0]?.url ? (
               <Image 
@@ -33,8 +54,8 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
               {artist.genres[0] || 'Artist'}
             </p>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 }
