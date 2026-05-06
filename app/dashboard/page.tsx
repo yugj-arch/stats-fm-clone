@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [tracks, setTracks] = useState<SpotifyTrack[]>([])
   const [recentTracks, setRecentTracks] = useState<any[]>([])
   const [isFetching, setIsFetching] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -31,15 +32,16 @@ export default function DashboardPage() {
   }, [user, isLoading, router])
 
   useEffect(() => {
-    if (user && session) {
+    if (user && (session || !isLoading)) {
       fetchData()
     }
-  }, [user, session, timeRange])
+  }, [user, session, timeRange, isLoading])
 
   const fetchData = async () => {
     setIsFetching(true)
+    setError(null)
     try {
-      const token = session?.provider_token || null
+      const token = session?.provider_token || localStorage.getItem('spotify_token')
       
       const [artistsData, tracksData, recentData] = await Promise.all([
         getTopArtists(token, timeRange),
@@ -50,8 +52,9 @@ export default function DashboardPage() {
       setArtists(artistsData)
       setTracks(tracksData)
       setRecentTracks(recentData)
-    } catch (error) {
-      console.error("Error fetching Spotify data:", error)
+    } catch (err: any) {
+      console.error("Error fetching Spotify data:", err)
+      setError(err.message || "Failed to fetch real data")
     } finally {
       setIsFetching(false)
     }
@@ -60,6 +63,8 @@ export default function DashboardPage() {
   if (isLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center bg-[#121212] text-white">Loading...</div>
   }
+
+  const isDemo = !session?.provider_token && !localStorage.getItem('spotify_token')
 
   const tabs = [
     { id: 'artists', label: 'Top Artists', icon: User },
@@ -70,6 +75,13 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-white selection:bg-[#1DB954] selection:text-white">
+      {/* Demo Banner */}
+      {isDemo && (
+        <div className="bg-[#1DB954]/10 border-b border-[#1DB954]/20 py-2 text-center text-[#1DB954] text-xs font-medium tracking-wide uppercase">
+          Viewing Demo Data — Sign in with Spotify for real stats
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#121212]/80 backdrop-blur-md border-b border-zinc-800">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
@@ -86,6 +98,20 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-6 py-8">
+        {error && !isDemo && (
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
+            <p className="font-bold mb-1">Error fetching real data:</p>
+            <p>{error}</p>
+            <Button 
+              variant="link" 
+              className="text-[#1DB954] p-0 h-auto mt-2" 
+              onClick={() => fetchData()}
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
+        
         <div className="flex flex-col md:flex-row gap-8 mb-8 items-start md:items-center justify-between">
           {/* Tabs */}
           <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar w-full md:w-auto">

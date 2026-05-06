@@ -40,21 +40,33 @@ const mockTracks: SpotifyTrack[] = Array.from({ length: 20 }).map((_, i) => ({
 
 async function fetchWebApi(endpoint: string, method: string, accessToken: string | null, body?: any) {
   if (!accessToken) {
-    console.warn('No access token provided to Spotify API call. Falling back to mocked responses.');
-    throw new Error('No access token');
+    throw new Error('No access token provided');
   }
 
-  const res = await fetch(`${SPOTIFY_API_BASE}/${endpoint}`, {
+  const options: RequestInit = {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
     method,
-    body: JSON.stringify(body),
-  });
+  };
+
+  if (body && method !== 'GET') {
+    options.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(`${SPOTIFY_API_BASE}/${endpoint}`, options);
 
   if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error('Spotify API Error:', {
+      status: res.status,
+      statusText: res.statusText,
+      endpoint,
+      errorData
+    });
+    
     if (res.status === 401) {
-      throw new Error('Spotify Access Token expired or invalid');
+      throw new Error('Spotify session expired. Please sign out and sign in again.');
     }
     throw new Error(`Spotify API error: ${res.statusText}`);
   }
@@ -63,49 +75,59 @@ async function fetchWebApi(endpoint: string, method: string, accessToken: string
 }
 
 export async function getTopTracks(accessToken: string | null, timeRange: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Promise<SpotifyTrack[]> {
+  if (!accessToken) return mockTracks;
   try {
     const data = await fetchWebApi(`me/top/tracks?time_range=${timeRange}&limit=20`, 'GET', accessToken);
     return data.items;
   } catch (err) {
-    return mockTracks;
+    console.error('getTopTracks failed:', err);
+    throw err;
   }
 }
 
 export async function getTopArtists(accessToken: string | null, timeRange: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Promise<SpotifyArtist[]> {
+  if (!accessToken) return mockArtists;
   try {
     const data = await fetchWebApi(`me/top/artists?time_range=${timeRange}&limit=20`, 'GET', accessToken);
     return data.items;
   } catch (err) {
-    return mockArtists;
+    console.error('getTopArtists failed:', err);
+    throw err;
   }
 }
 
 export async function getRecentlyPlayed(accessToken: string | null): Promise<any[]> {
+  if (!accessToken) {
+    return Array.from({ length: 50 }).map(() => ({
+      track: mockTracks[0],
+      played_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+    }));
+  }
   try {
     const data = await fetchWebApi(`me/player/recently-played?limit=50`, 'GET', accessToken);
     return data.items;
   } catch (err) {
-    // Generate some mock history for heatmap
-    return Array.from({ length: 50 }).map(() => ({
-      track: mockTracks[0],
-      played_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(), // Random time in last 7 days
-    }));
+    console.error('getRecentlyPlayed failed:', err);
+    throw err;
   }
 }
 
 export async function getAudioFeatures(accessToken: string | null, trackIds: string[]): Promise<any[]> {
   if (trackIds.length === 0) return [];
-  try {
-    const ids = trackIds.slice(0, 100).join(',');
-    const data = await fetchWebApi(`audio-features?ids=${ids}`, 'GET', accessToken);
-    return data.audio_features;
-  } catch (err) {
-    // Return mock features
+  if (!accessToken) {
     return trackIds.map(id => ({
       id,
       valence: Math.random(),
       energy: Math.random(),
       danceability: Math.random(),
     }));
+  }
+  try {
+    const ids = trackIds.slice(0, 100).join(',');
+    const data = await fetchWebApi(`audio-features?ids=${ids}`, 'GET', accessToken);
+    return data.audio_features;
+  } catch (err) {
+    console.error('getAudioFeatures failed:', err);
+    throw err;
   }
 }
