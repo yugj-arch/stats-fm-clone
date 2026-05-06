@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { toast } from "sonner"
 
+import { generateRandomString, generateCodeChallenge } from "@/lib/spotify-pkce"
+
 export default function HomePage() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
@@ -20,14 +22,25 @@ export default function HomePage() {
 
   const handleSpotifyLogin = async () => {
     try {
-      // Bypassing Supabase and using standard Spotify Implicit Grant flow for local testing
       const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "f9d8ce31ab9746c198dd7d218b19eba8"
-      const redirectUri = encodeURIComponent(`${window.location.origin}/dashboard`)
-      const scopes = encodeURIComponent('user-top-read user-read-recently-played user-read-private')
+      const redirectUri = `${window.location.origin}/dashboard`
       
-      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token&show_dialog=true`
+      const codeVerifier = generateRandomString(128)
+      const codeChallenge = await generateCodeChallenge(codeVerifier)
       
-      window.location.href = authUrl
+      localStorage.setItem('spotify_code_verifier', codeVerifier)
+      
+      const params = new URLSearchParams({
+        client_id: clientId,
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+        scope: 'user-top-read user-read-recently-played user-read-private',
+        show_dialog: 'true'
+      })
+      
+      window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`
     } catch (error: any) {
       toast.error("Failed to initiate Spotify login")
     }

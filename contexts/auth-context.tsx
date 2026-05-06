@@ -35,21 +35,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         console.log('[AuthContext] Initializing...')
 
-        // Check if we are returning from Spotify OAuth (Implicit Grant Flow)
-        if (typeof window !== 'undefined' && window.location.hash) {
-          const hash = window.location.hash.substring(1)
-          const params = new URLSearchParams(hash)
-          const accessToken = params.get('access_token')
+        // Check if we are returning from Spotify OAuth (PKCE Flow)
+        const urlParams = new URLSearchParams(window.location.search)
+        const code = urlParams.get('code')
+        
+        if (code) {
+          const codeVerifier = localStorage.getItem('spotify_code_verifier')
+          const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "f9d8ce31ab9746c198dd7d218b19eba8"
+          const redirectUri = `${window.location.origin}/dashboard`
           
-          if (accessToken) {
-            // Save token and clear hash to clean up the URL
-            localStorage.setItem('spotify_token', accessToken)
-            window.history.replaceState(null, '', window.location.pathname)
+          if (codeVerifier) {
+            const response = await fetch('https://accounts.spotify.com/api/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                client_id: clientId,
+                grant_type: 'authorization_code',
+                code,
+                redirect_uri: redirectUri,
+                code_verifier: codeVerifier,
+              }),
+            })
             
-            setUser({ id: 'spotify-user' } as User)
-            setSession({ provider_token: accessToken } as Session)
-            setIsLoading(false)
-            return
+            const data = await response.json()
+            
+            if (data.access_token) {
+              localStorage.setItem('spotify_token', data.access_token)
+              localStorage.removeItem('spotify_code_verifier')
+              // Remove code from URL
+              window.history.replaceState(null, '', window.location.pathname)
+              
+              setUser({ id: 'spotify-user' } as User)
+              setSession({ provider_token: data.access_token } as Session)
+              setIsLoading(false)
+              return
+            }
           }
         }
 
