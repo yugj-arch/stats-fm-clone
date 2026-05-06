@@ -36,7 +36,7 @@ export default function HomePage() {
         redirect_uri: redirectUri,
         code_challenge_method: 'S256',
         code_challenge: codeChallenge,
-        scope: 'user-top-read user-read-recently-played user-read-private',
+        scope: 'user-top-read user-read-recently-played user-read-private user-read-email',
         show_dialog: 'true'
       })
       
