@@ -130,26 +130,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-6 py-8">
-        {error && (
-          <div className="mb-8 p-5 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl text-yellow-300 text-sm">
-            <p className="font-bold mb-2 text-base">⚠️ Spotify Access Blocked (403)</p>
-            <p className="text-yellow-400/80 mb-3">Your Spotify app is in <strong>Development Mode</strong>. To get real data, make sure:</p>
-            <ol className="list-decimal list-inside space-y-1 text-yellow-400/80 mb-3">
-              <li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" className="underline text-yellow-300">Spotify Developer Dashboard</a> → Your App → Settings → User Management</li>
-              <li>Add your exact Spotify email address and click <strong>"Add User"</strong></li>
-              <li>Click <strong>"Save"</strong> at the bottom</li>
-              <li>Come back, click <strong>Sign Out</strong>, then log in again</li>
-            </ol>
-            <Button 
-              variant="link" 
-              className="text-[#1DB954] p-0 h-auto" 
-              onClick={() => fetchData()}
-            >
-              Try Again
-            </Button>
-          </div>
-        )}
-        
         <div className="flex flex-col md:flex-row gap-8 mb-8 items-start md:items-center justify-between">
           {/* Tabs */}
           <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar w-full md:w-auto">
