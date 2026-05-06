@@ -40,11 +40,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const code = urlParams.get('code')
         
         if (code) {
+          // Clear old tokens immediately to prevent silent fallbacks to 403-ing tokens
+          localStorage.removeItem('spotify_token')
+          
           const codeVerifier = localStorage.getItem('spotify_code_verifier')
           const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "f9d8ce31ab9746c198dd7d218b19eba8"
           const redirectUri = `${window.location.origin}/dashboard`
           
           if (codeVerifier) {
+            console.log('[AuthContext] Exchanging code for token...')
             const response = await fetch('https://accounts.spotify.com/api/token', {
               method: 'POST',
               headers: {
@@ -61,7 +65,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             
             const data = await response.json()
             
+            if (!response.ok) {
+              console.error('[AuthContext] Token exchange failed:', data)
+              setIsLoading(false)
+              return
+            }
+            
             if (data.access_token) {
+              console.log('[AuthContext] Token received successfully!')
               localStorage.setItem('spotify_token', data.access_token)
               localStorage.removeItem('spotify_code_verifier')
               // Remove code from URL
