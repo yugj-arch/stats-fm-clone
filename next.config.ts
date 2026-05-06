@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'lineup-images.scdn.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
       }
     ],
   },
