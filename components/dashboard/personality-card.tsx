@@ -5,6 +5,7 @@ import { SpotifyTrack, SpotifyArtist, getAudioFeatures } from "@/lib/spotify"
 import { Button } from "@/components/ui/button"
 import { Download, Sparkles } from "lucide-react"
 import html2canvas from "html2canvas"
+import { motion } from "framer-motion"
 
 export function PersonalityCard({ tracks, artists, session }: { tracks: SpotifyTrack[], artists: SpotifyArtist[], session: any }) {
   const cardRef = useRef<HTMLDivElement>(null)
@@ -120,7 +121,12 @@ export function PersonalityCard({ tracks, artists, session }: { tracks: SpotifyT
                 <span className="text-white">{mood ? Math.round(mood.valence * 100) : 0}%</span>
               </div>
               <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-blue-500 to-green-400" style={{ width: `${mood ? mood.valence * 100 : 0}%` }} />
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-blue-500 to-green-400" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${mood ? mood.valence * 100 : 0}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
               </div>
             </div>
 
@@ -130,7 +136,12 @@ export function PersonalityCard({ tracks, artists, session }: { tracks: SpotifyT
                 <span className="text-white">{mood ? Math.round(mood.energy * 100) : 0}%</span>
               </div>
               <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-yellow-500 to-red-500" style={{ width: `${mood ? mood.energy * 100 : 0}%` }} />
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-red-500" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${mood ? mood.energy * 100 : 0}%` }}
+                  transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
+                />
               </div>
             </div>
 
@@ -140,7 +151,12 @@ export function PersonalityCard({ tracks, artists, session }: { tracks: SpotifyT
                 <span className="text-white">{mood ? Math.round(mood.danceability * 100) : 0}%</span>
               </div>
               <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500" style={{ width: `${mood ? mood.danceability * 100 : 0}%` }} />
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${mood ? mood.danceability * 100 : 0}%` }}
+                  transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                />
               </div>
             </div>
           </div>
