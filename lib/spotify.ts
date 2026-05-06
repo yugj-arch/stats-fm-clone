@@ -69,9 +69,9 @@ async function fetchWebApi(endpoint: string, method: string, accessToken: string
     });
     
     if (res.status === 401) {
-      throw new Error('Spotify session expired. Please sign out and sign in again.');
+      throw new Error('Spotify session expired (401). Please sign out and sign in again.');
     }
-    throw new Error(`Spotify API error: ${message}`);
+    throw new Error(`Spotify API error (${res.status}): ${message}`);
   }
 
   return await res.json();
