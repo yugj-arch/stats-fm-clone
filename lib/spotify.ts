@@ -58,9 +58,12 @@ async function fetchWebApi(endpoint: string, method: string, accessToken: string
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
+    const message = errorData?.error?.message || res.statusText || 'Unknown error';
+    
     console.error('Spotify API Error:', {
       status: res.status,
       statusText: res.statusText,
+      message,
       endpoint,
       errorData
     });
@@ -68,7 +71,7 @@ async function fetchWebApi(endpoint: string, method: string, accessToken: string
     if (res.status === 401) {
       throw new Error('Spotify session expired. Please sign out and sign in again.');
     }
-    throw new Error(`Spotify API error: ${res.statusText}`);
+    throw new Error(`Spotify API error: ${message}`);
   }
 
   return await res.json();
