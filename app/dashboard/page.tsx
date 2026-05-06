@@ -50,45 +50,51 @@ export default function DashboardPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white selection:bg-[#1DB954] selection:text-white">
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#1DB954] selection:text-black font-sans overflow-x-hidden">
+      {/* Texture & Grid Overlays */}
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-50" />
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#121212]/80 backdrop-blur-md border-b border-zinc-800">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-            <span className="text-[#1DB954]">stats</span>.fm clone
+      <header className="sticky top-0 z-[60] bg-[#050505]/60 backdrop-blur-xl border-b border-zinc-900">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3 font-black text-2xl tracking-tighter uppercase group cursor-pointer" onClick={() => router.push('/')}>
+            <div className="w-8 h-8 rounded-lg bg-[#1DB954] flex items-center justify-center group-hover:rotate-6 transition-transform">
+              <Sparkles className="w-5 h-5 text-black fill-black" />
+            </div>
+            <span>stats<span className="text-[#1DB954]">.fm</span></span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 mr-4 border-r border-zinc-800 pr-4">
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-4 pl-6 border-l border-zinc-900">
               <div className="text-right">
-                <p className="text-xs font-bold text-white leading-tight">Yug Jain</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">Music Explorer</p>
+                <p className="text-xs font-black text-white leading-none tracking-tight uppercase">Yug Jain</p>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">PRO EXPLORER</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1DB954] to-emerald-700 flex items-center justify-center text-[11px] font-black text-black">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#1DB954] to-emerald-600 flex items-center justify-center text-xs font-black text-black shadow-lg shadow-[#1DB954]/10">
                 YJ
               </div>
             </div>
-            <Button variant="ghost" className="text-zinc-400 hover:text-white" onClick={() => router.push('/')}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Home
+            <Button variant="ghost" className="text-zinc-500 hover:text-white hover:bg-zinc-900 rounded-full h-10 w-10 p-0" onClick={() => router.push('/')}>
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row gap-8 mb-8 items-start md:items-center justify-between">
+      <main className="container mx-auto px-6 py-12 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-8 mb-12 items-start lg:items-center justify-between">
           {/* Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar w-full md:w-auto">
+          <div className="flex gap-2 bg-zinc-900/40 p-1.5 rounded-[2rem] border border-zinc-900/50 backdrop-blur-sm overflow-x-auto max-w-full hide-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap
+                className={`flex items-center gap-2.5 px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap
                   ${activeTab === tab.id 
-                    ? 'bg-[#1DB954] text-black shadow-[0_0_15px_rgba(29,185,84,0.3)]' 
-                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
+                    ? 'bg-white text-black shadow-xl scale-105' 
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30'}`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-black' : 'text-zinc-500'}`} />
                 {tab.label}
               </button>
             ))}
@@ -96,17 +102,17 @@ export default function DashboardPage() {
 
           {/* Time Range Selector */}
           {(activeTab === 'artists' || activeTab === 'tracks') && (
-            <div className="flex gap-2 bg-zinc-900 p-1 rounded-full">
+            <div className="flex gap-1.5 bg-zinc-900/40 p-1.5 rounded-full border border-zinc-900/50 backdrop-blur-sm">
               {[
-                { id: 'short_term', label: '4 Weeks' },
-                { id: 'medium_term', label: '6 Months' },
-                { id: 'long_term', label: 'All Time' },
+                { id: 'short_term', label: '4W' },
+                { id: 'medium_term', label: '6M' },
+                { id: 'long_term', label: 'ALL' },
               ].map((range) => (
                 <button
                   key={range.id}
                   onClick={() => setTimeRange(range.id as TimeRange)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
-                    ${timeRange === range.id ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
+                  className={`w-12 h-10 rounded-full text-[10px] font-black transition-all
+                    ${timeRange === range.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-600 hover:text-zinc-400'}`}
                 >
                   {range.label}
                 </button>
@@ -116,13 +122,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Content Area */}
-        <div className="min-h-[500px]">
+        <div className="min-h-[600px]">
           {isFetching ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1DB954]"></div>
+            <div className="flex items-center justify-center h-[400px]">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full border-2 border-zinc-800 border-t-[#1DB954] animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-[#1DB954] animate-pulse" />
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="animate-in fade-in duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
               {activeTab === 'artists' && <TopArtists artists={artists} />}
               {activeTab === 'tracks' && <TopTracks tracks={tracks} />}
               {activeTab === 'heatmap' && <Heatmap recentTracks={recentTracks} />}
@@ -132,5 +143,6 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+
   )
 }

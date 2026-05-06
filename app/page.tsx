@@ -1,8 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { BarChart3, Clock, Share2, Sparkles } from "lucide-react"
+import { BarChart3, Clock, Share2, Sparkles, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 
 export default function HomePage() {
   const router = useRouter()
@@ -12,77 +13,138 @@ export default function HomePage() {
       icon: BarChart3,
       title: "Deep Analytics",
       description: "Discover your top tracks, artists, and genres with precise historical data.",
+      color: "from-blue-500 to-cyan-400"
     },
     {
       icon: Clock,
       title: "Listening Patterns",
       description: "Visualize when you listen the most with our interactive activity heatmaps.",
+      color: "from-[#1DB954] to-emerald-400"
     },
     {
       icon: Sparkles,
       title: "Personality Insights",
       description: "Get a comprehensive analysis of your music mood, energy, and danceability.",
+      color: "from-purple-500 to-pink-500"
     },
     {
       icon: Share2,
       title: "Shareable Cards",
       description: "Generate beautiful, shareable aesthetic cards of your music personality.",
+      color: "from-orange-500 to-yellow-400"
     },
   ]
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white selection:bg-[#1DB954] selection:text-white">
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#1DB954] selection:text-black font-sans overflow-x-hidden">
+      {/* Texture & Grid Overlays */}
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-50" />
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center justify-center flex-col">
-        {/* Background gradient effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1DB954]/20 blur-[120px] rounded-full pointer-events-none" />
+      <section className="relative min-h-screen flex items-center justify-center flex-col px-6 overflow-hidden">
+        {/* Background glow effects */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2 }}
+          className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[#1DB954]/20 blur-[150px] rounded-full pointer-events-none" 
+        />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2, delay: 0.5 }}
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-600/10 blur-[150px] rounded-full pointer-events-none" 
+        />
         
-        <div className="container relative z-10 mx-auto px-6 py-16 text-center space-y-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1DB954]/10 text-[#1DB954] text-sm font-medium border border-[#1DB954]/20">
-            <Sparkles className="w-4 h-4" />
+        <div className="container relative z-10 mx-auto text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 text-zinc-400 text-xs font-black tracking-[0.2em] uppercase border border-zinc-800 mb-8"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#1DB954]" />
             Your Music DNA, Decoded
-          </div>
+          </motion.div>
           
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-balance">
-            Your Spotify Stats,<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1DB954] to-[#1ed760]">
-              Reimagined.
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] mb-10"
+          >
+            YOUR STATS.<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1DB954] via-emerald-400 to-teal-400">
+              REIMAGINED.
             </span>
-          </h1>
+          </motion.h1>
           
-          <p className="text-lg md:text-xl text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto">
-            Get deep analytics on your listening history. Top artists, tracks, unique listening heatmaps, and your personalized music personality card.
-          </p>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="text-base md:text-xl text-zinc-500 font-medium leading-relaxed max-w-xl mx-auto mb-12"
+          >
+            Go beyond simple top charts. Explore your listening habits with high-fidelity analytics and beautiful visual insights.
+          </motion.p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
             <Button 
               size="lg" 
-              className="px-8 py-7 text-lg bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-full transition-all hover:scale-105"
+              className="px-10 py-8 text-base bg-white hover:bg-zinc-100 text-black font-black rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] group"
               onClick={() => router.push('/dashboard')}
             >
-              <svg viewBox="0 0 24 24" className="w-6 h-6 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.84.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-              </svg>
-              Explore My Stats
+              EXPLORE MY STATS
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-          </div>
+          </motion.div>
         </div>
+
+        {/* Scroll Indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <div className="w-px h-12 bg-gradient-to-b from-zinc-800 to-transparent" />
+        </motion.div>
       </section>
 
       {/* Features Grid */}
-      <section className="container mx-auto px-6 py-24 border-t border-zinc-800">
+      <section className="container mx-auto px-6 py-32 border-t border-zinc-900/50">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature) => (
-            <div key={feature.title} className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
-              <div className="w-12 h-12 rounded-full bg-[#1DB954]/10 flex items-center justify-center mb-6">
-                <feature.icon className="w-6 h-6 text-[#1DB954]" />
+          {features.map((feature, idx) => (
+            <motion.div 
+              key={feature.title} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="group p-8 rounded-[2rem] bg-zinc-900/20 border border-zinc-900 hover:border-zinc-800 transition-all hover:bg-zinc-900/40"
+            >
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} p-0.5 mb-8 rotate-3 group-hover:rotate-6 transition-transform`}>
+                <div className="w-full h-full bg-black rounded-[14px] flex items-center justify-center">
+                  <feature.icon className="w-6 h-6 text-white" />
+                </div>
               </div>
-              <h3 className="font-bold text-xl mb-3">{feature.title}</h3>
-              <p className="text-zinc-400 leading-relaxed">{feature.description}</p>
-            </div>
+              <h3 className="font-black text-xl mb-4 tracking-tight uppercase">{feature.title}</h3>
+              <p className="text-zinc-500 text-sm font-medium leading-relaxed group-hover:text-zinc-400 transition-colors">{feature.description}</p>
+            </motion.div>
           ))}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="container mx-auto px-6 py-12 text-center border-t border-zinc-900/50">
+        <p className="text-[10px] text-zinc-700 font-black tracking-[0.3em] uppercase">Stats.fm Clone • Created with Love</p>
+      </footer>
     </div>
   )
 }
+
