@@ -20,16 +20,16 @@ export default function HomePage() {
 
   const handleSpotifyLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'spotify',
-        options: {
-          scopes: 'user-top-read user-read-recently-played user-read-private',
-          redirectTo: `${window.location.origin}/auth/v1/callback`
-        }
-      })
-      if (error) throw error
+      // Bypassing Supabase and using standard Spotify Implicit Grant flow for local testing
+      const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "f9d8ce31ab9746c198dd7d218b19eba8"
+      const redirectUri = encodeURIComponent(`${window.location.origin}/dashboard`)
+      const scopes = encodeURIComponent('user-top-read user-read-recently-played user-read-private')
+      
+      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token&show_dialog=true`
+      
+      window.location.href = authUrl
     } catch (error: any) {
-      toast.error(error.message || "Failed to initiate Spotify login")
+      toast.error("Failed to initiate Spotify login")
     }
   }
 

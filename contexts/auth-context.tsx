@@ -37,7 +37,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         console.log('[AuthContext] Initializing...')
 
-        // First check if there's a session (won't throw if no session exists)
+        // Check if we are returning from Spotify OAuth (Implicit Grant Flow)
+        if (typeof window !== 'undefined' && window.location.hash) {
+          const hash = window.location.hash.substring(1)
+          const params = new URLSearchParams(hash)
+          const accessToken = params.get('access_token')
+          
+          if (accessToken) {
+            // Save token and clear hash to clean up the URL
+            localStorage.setItem('spotify_token', accessToken)
+            window.history.replaceState(null, '', window.location.pathname)
+            
+            setUser({ id: 'spotify-user' } as User)
+            setSession({ provider_token: accessToken } as Session)
+            setIsLoading(false)
+            return
+          }
+        }
+
+        // Check local storage for existing Spotify token
+        const savedToken = typeof window !== 'undefined' ? localStorage.getItem('spotify_token') : null
+        if (savedToken) {
+          setUser({ id: 'spotify-user' } as User)
+          setSession({ provider_token: savedToken } as Session)
+          setIsLoading(false)
+          return
+        }
+
+        // Fallback to Supabase
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
         if (sessionError) {
@@ -47,7 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return
         }
 
-        // Only try to get user if we have a session
         if (session) {
           setSession(session)
           const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -79,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (localStorage.getItem('spotify_token')) return; // Ignore Supabase state if using Spotify implicit token
       console.log('[AuthContext] Auth state changed:', session?.user ? session.user.id : 'logged out')
       setUser(session?.user ?? null)
       setSession(session ?? null)
@@ -92,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
+    localStorage.removeItem('spotify_token')
     const { error } = await supabase.auth.signOut()
     if (error) {
       console.error("Sign out error:", error)
